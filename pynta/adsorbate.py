@@ -40,6 +40,7 @@ def construct_initial_guess_files(mol,mol_name,pynta_path,slab,metal,
         list of files with the corresponding xyzs
     """
     if os.path.exists(os.path.join(pynta_path,"Adsorbates",mol_name)):
+        logging.info("Found existing path {0} for {1}".format(os.path.join(pynta_path,"Adsorbates",mol_name),mol_name))
         return
     
     surf_sites = mol.get_surface_sites()
@@ -62,29 +63,29 @@ def construct_initial_guess_files(mol,mol_name,pynta_path,slab,metal,
 
         gratom_to_molecule_atom_map = {val:key for key,val in mol_to_atoms_map.items()}
 
-        adatoms = []
         surf_index_atom_map = dict()
         for i,atm in enumerate(mol.atoms):
             if atm.is_bonded_to_surface():
                 surf_index_atom_map[mol_to_atoms_map[i]] = i
 
         gratom_to_molecule_surface_atom_map = surf_index_atom_map
-        xyzs = []
-        for i,structure in enumerate(structs):
-            prefix = i
-            try:
-                os.makedirs(os.path.join(pynta_path,"Adsorbates",mol_name,str(prefix)))
-            except:
-                pass
-            xyz = os.path.join(pynta_path,"Adsorbates",mol_name,str(prefix),str(prefix)+"_init.xyz")
-            xyzs.append(xyz)
-            write(xyz,structure)
-            sp_dict = {"name":mol_name, "adjlist":mol.to_adjacency_list(),"atom_to_molecule_atom_map": gratom_to_molecule_atom_map,
-                    "gratom_to_molecule_surface_atom_map": gratom_to_molecule_surface_atom_map, "nslab": nslab}
-            with open(os.path.join(pynta_path,"Adsorbates",mol_name,"info.json"),'w') as f:
-                json.dump(sp_dict,f)
         
-        return xyzs
+    xyzs = []
+    for i,structure in enumerate(structs):
+        prefix = i
+        try:
+            os.makedirs(os.path.join(pynta_path,"Adsorbates",mol_name,str(prefix)))
+        except:
+            pass
+        xyz = os.path.join(pynta_path,"Adsorbates",mol_name,str(prefix),str(prefix)+"_init.xyz")
+        xyzs.append(xyz)
+        write(xyz,structure)
+        sp_dict = {"name":mol_name, "adjlist":mol.to_adjacency_list(),"atom_to_molecule_atom_map": gratom_to_molecule_atom_map,
+                "gratom_to_molecule_surface_atom_map": gratom_to_molecule_surface_atom_map, "nslab": nslab}
+        with open(os.path.join(pynta_path,"Adsorbates",mol_name,"info.json"),'w') as f:
+            json.dump(sp_dict,f)
+        
+    return xyzs
                 
 def generate_adsorbate_guesses(mol,ads,slab,mol_to_atoms_map,metal,
                                single_site_bond_params_lists,single_sites_lists,double_site_bond_params_lists,double_sites_lists,
@@ -188,6 +189,7 @@ def generate_adsorbate_guesses(mol,ads,slab,mol_to_atoms_map,metal,
         geo_out,Eharm,_ = outputs[i]
         if geo_out:
             del geo_out["constraints"]
+            del geo_out["forces"]
             geo_out = Atoms(**geo_out)
             geo_out.calc = None
             geos_out.append(geo_out)
