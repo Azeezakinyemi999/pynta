@@ -1,0 +1,26 @@
+name: pynta_env
+channels:
+  - defaults
+  - mjohnson541
+  - conda-forge
+dependencies:
+  - python =3.8
+  - matplotlib
+  - spglib
+  - ase =3.22.1
+  - scipy >=1.1.0
+  - numpy
+  - pyyaml
+  - sella >=2.2.1
+  - sphinx
+  - fireworks
+  - tblite
+  - tblite-python
+  - rmgmolecule
+  - acat
+  - nose
+  - coverage
+  - liblapack !=3.9.0
+  - pysidt >=1
+  - ruamel.yaml < 0.18
+  - flask =2.2.5
